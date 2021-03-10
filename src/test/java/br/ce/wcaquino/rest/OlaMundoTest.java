@@ -134,7 +134,7 @@ public class OlaMundoTest {
 	}
 	
 	@Test
-	public void devoVerificarlsita() {
+	public void devoVerificarlista() {
 		given()
 		.when()
 			.get("http://restapi.wcaquino.me/users/3")
@@ -150,6 +150,16 @@ public class OlaMundoTest {
 			
 			// Verificando a segunda posicao
 			.body("filhos[1].name", is("Luizinho"));
+	}
+	
+	@Test
+	public void devoVerificarErro() {
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/users/4")
+		.then()
+			.statusCode(404)
+			.body("error", is("Usuário inexistente"));
 	}
 
 }
