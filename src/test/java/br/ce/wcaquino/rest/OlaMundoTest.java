@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -245,6 +246,20 @@ public class OlaMundoTest {
 			
 			// Verique todos os salarios e some, devendo ser maior que 3000 e menor que 5000
 			.body("salary.findAll{it != null}.sum()", allOf(greaterThan(3000d), lessThan(5000d)));
+	}
+	
+	@Test
+	public void deveUnirJsonPathComJava() {
+		ArrayList<String> nomes =
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/users")
+		.then()
+			.statusCode(200)
+			.extract().path("name.finsAll{it.startsWith('Maria')}");
+		
+		assertEquals(1, nomes.size());
+		assertEquals(nomes.get(0).toUpperCase(), "maria joaquina".toUpperCase());
 	}
 
 }
