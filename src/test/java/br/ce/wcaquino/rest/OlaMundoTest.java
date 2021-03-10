@@ -2,12 +2,18 @@ package br.ce.wcaquino.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.http.Method;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 
 public class OlaMundoTest {
 
@@ -66,8 +72,84 @@ public class OlaMundoTest {
 		// Verifique se o nome comeca com... && temina com.... && contem...
 		assertThat("Joaquina", allOf(startsWith("m"), endsWith("ia"), containsString("ar")));
 		
+	}
+	
+	@Test
+	public void devoValidarBody() {
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/ola")
+		.then().
+			statusCode(200)
+			// Verificacao rigida com toda a resposta
+			.body(is("Ola, Mundo!"))
+			// Verificacao flexivel
+			.body(contains("Ola"))
+			// Verificacao generica (Verifique se a respota nao esta vazia)
+			.body(is(not(nullValue())));
+		
+	}
+	
+	@Test
+	public void devoValidarBodyPrimeiroNivel() {
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/users/1")
+		.then()
+			.statusCode(200)
+			.body("id", is(1))
+			.body("name", containsString("Silva"))
+			.body("age", greaterThan(17));
+	}
+	
+	@Test
+	public void devoValidarBodyPrimeiroNivelOutrasFormas() {
+		Response response = RestAssured.request(Method.GET, "http://restapi.wcaquino.me/users/1");
+		
+		// Utilizando o path
+		assertEquals(new Integer(1), response.path("id"));
+		
+		// Utilizando o JsonPath
+		JsonPath jsonPath = new JsonPath(response.asString());
+		assertEquals(1, jsonPath.getInt("id"));
+		
+		// utilizando o from
+		int id = JsonPath.from(response.asString()).getInt("id");
+		assertEquals(1, id);
 		
 		
+	}
+	
+
+	@Test
+	public void devoValidarBodySegundoNivel() {
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/users/2")
+		.then()
+			.statusCode(200)
+			.body("name", containsString("Joaquina"))
+			// Acessando o segundo nivel do json
+			.body("endereco.rua", containsString("bobos"));
+	}
+	
+	@Test
+	public void devoVerificarlsita() {
+		given()
+		.when()
+			.get("http://restapi.wcaquino.me/users/3")
+		.then()
+			.statusCode(200)
+			.body("name", containsString("Ana"))
+			
+			// Vericando o tamanho da lsita por nivel
+			.body("filhos", hasSize(2))
+			
+			// Verificando a primeira posicao
+			.body("filhos[0].name", is("Zezinho"))
+			
+			// Verificando a segunda posicao
+			.body("filhos[1].name", is("Luizinho"));
 	}
 
 }
