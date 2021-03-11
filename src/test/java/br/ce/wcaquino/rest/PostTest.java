@@ -92,7 +92,7 @@ public class PostTest {
 	}
 	
 	@Test
-	public void naoDeveRemoverUsuario(){
+	public void naoDeveRemoverUsuarioInexistente(){
 		given()
 			.log().all()
 		.when()
