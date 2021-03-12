@@ -19,6 +19,7 @@ public class JWTTest {
 		login.put("senha", "123456");
 		
 		// LOgin na api
+		// Recebero token
 		String token =
 		given()
 			.log().all()
@@ -31,8 +32,6 @@ public class JWTTest {
 			.statusCode(200)
 			.extract().path("token");
 		
-		
-		// Recebero token
 		given()
 			.log().all()
 			.header("Authorization", "JWT" + token)
